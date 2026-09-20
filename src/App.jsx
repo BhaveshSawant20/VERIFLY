@@ -16,14 +16,11 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // If navigating to another page, start at the top
-    if (pathname !== "/") {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "instant",
-      });
-    }
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
   }, [pathname]);
 
   return null;
@@ -56,6 +53,34 @@ function App() {
       left: 0,
       behavior: "smooth",
     });
+
+    /*
+     * Update the URL hash without causing another page navigation.
+     */
+    window.history.replaceState(null, "", `/${hash}`);
+  };
+
+  /*
+   * Always return to the top when Home is clicked.
+   */
+  const handleHomeClick = (event) => {
+    if (window.location.pathname === "/") {
+      event.preventDefault();
+
+      /*
+       * Remove #verify / #issue from the URL.
+       */
+      window.history.replaceState(null, "", "/");
+
+      /*
+       * Scroll all the way to the top of Home.
+       */
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "smooth",
+      });
+    }
   };
 
   const connectWallet = async () => {
@@ -129,12 +154,19 @@ function App() {
       <ScrollToTop />
 
       <nav className="navbar">
-        <Link to="/" className="logo" aria-label="VERIFLY Home">
+        <Link
+          to="/"
+          className="logo"
+          aria-label="VERIFLY Home"
+          onClick={handleHomeClick}
+        >
           <img src={veriflyLogo} alt="VERIFLY" />
         </Link>
 
         <div className="nav-links">
-          <Link to="/">Home</Link>
+          <Link to="/" onClick={handleHomeClick}>
+            Home
+          </Link>
 
           <button
             type="button"
@@ -153,6 +185,7 @@ function App() {
           </button>
 
           <Link to="/team">Team</Link>
+
           <Link to="/details">Details</Link>
         </div>
 
@@ -175,6 +208,7 @@ function App() {
         />
 
         <Route path="/team" element={<Team />} />
+
         <Route path="/details" element={<Details />} />
       </Routes>
     </BrowserRouter>
