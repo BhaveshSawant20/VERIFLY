@@ -94,35 +94,80 @@ a {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
   /* Transparent glass effect */
-  background: rgba(5, 18, 12, 0.35);
+  background: rgba(5, 18, 12, 0.30);
 
-  /* Stronger blur for content passing underneath */
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  /*
+    IMPORTANT:
+    Creates a stacking context so the glass layer
+    stays inside the navbar and above page content.
+  */
+  isolation: isolate;
+
+  /*
+    Strong backdrop blur.
+    This blurs the content/background passing behind
+    the navbar instead of blurring the navbar contents.
+  */
+  backdrop-filter: blur(28px) saturate(125%);
+  -webkit-backdrop-filter: blur(28px) saturate(125%);
 
   box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.12),
     inset 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.logo {
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: -1px;
-  color: #ffffff;
-  text-decoration: none;
-  transition:
-    transform 0.25s ease,
-    color 0.25s ease;
+/*
+  Glass layer responsible for visibly blurring
+  whatever is behind the navbar.
+*/
+.navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: rgba(5, 18, 12, 0.16);
+
+  backdrop-filter: blur(22px) saturate(125%);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+
+  pointer-events: none;
+
+  /*
+    IMPORTANT:
+    Previously this was z-index: -1.
+    That could place the blur layer behind the navbar.
+  */
+  z-index: 0;
 }
 
-.logo span {
-  color: #55d98a;
+/*
+  Keep navbar contents above the glass layer.
+*/
+.navbar > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* ========================================
+   LOGO
+======================================== */
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  height: 80px;
+}
+
+.logo img {
+  width: auto;
+  height: 80px;
+  display: block;
+  object-fit: contain;
 }
 
 .logo:hover {
-  transform: scale(1.05);
+  text-decoration: none;
 }
 
 /* ========================================
@@ -854,7 +899,7 @@ a {
   gap: 28px;
 
   /* Keeps Verify / Issue section below the navbar */
-  scroll-margin-top: 115px;
+  scroll-margin-top: 125px;
 
   position: relative;
   z-index: 3;
@@ -1210,6 +1255,7 @@ a {
 
 /* ========================================
    VERIFLY PAGE SIGNATURE
+
    Normal document-flow signature.
    NOT fixed.
    NOT sticky.
@@ -1731,79 +1777,23 @@ a {
   }
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  height: 80px;
-}
-
-.logo img {
-  width: auto;
-  height: 80px;
-  display: block;
-  object-fit: contain;
-}
-
-.logo:hover {
-  text-decoration: none;
-}
-
-/* ========================================
-   TRANSPARENT BLURRED NAVBAR
-======================================== */
-
-.navbar {
-  background: rgba(5, 18, 12, 0.38);
-
-  backdrop-filter: blur(28px) saturate(125%);
-  -webkit-backdrop-filter: blur(28px) saturate(125%);
-
-  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-
-  box-shadow:
-    0 8px 30px rgba(0, 0, 0, 0.10),
-    inset 0 1px rgba(255, 255, 255, 0.06);
-}
-
-
-/* Extra glass layer to make content behind the navbar
-   visibly blurred while scrolling */
-
-.navbar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  background: rgba(5, 18, 12, 0.16);
-
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-
-  pointer-events: none;
-  z-index: -1;
-}
-
-
-/* Keep navbar contents above the glass layer */
-
-.navbar > * {
-  position: relative;
-  z-index: 2;
-}
-
-
 /* ========================================
    VERIFY / ISSUE SCROLL POSITION
 ======================================== */
+
+/*
+  Keeps the Verify / Issue workspace below
+  the sticky navbar when scrolling.
+*/
 
 .workspace {
   scroll-margin-top: 125px;
 }
 
-
-/* Extra protection for browsers that don't
-   properly apply scroll-margin-top */
+/*
+  Extra protection for browsers that don't
+  properly apply scroll-margin-top.
+*/
 
 html {
   scroll-padding-top: 125px;
