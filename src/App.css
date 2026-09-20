@@ -1748,3 +1748,63 @@ a {
 .logo:hover {
   text-decoration: none;
 }
+
+/* ========================================
+   TRANSPARENT BLURRED NAVBAR
+======================================== */
+
+.navbar {
+  background: rgba(5, 18, 12, 0.38);
+
+  backdrop-filter: blur(28px) saturate(125%);
+  -webkit-backdrop-filter: blur(28px) saturate(125%);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.10),
+    inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+
+/* Extra glass layer to make content behind the navbar
+   visibly blurred while scrolling */
+
+.navbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: rgba(5, 18, 12, 0.16);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  pointer-events: none;
+  z-index: -1;
+}
+
+
+/* Keep navbar contents above the glass layer */
+
+.navbar > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ========================================
+   VERIFY / ISSUE SCROLL POSITION
+======================================== */
+
+.workspace {
+  scroll-margin-top: 125px;
+}
+
+
+/* Extra protection for browsers that don't
+   properly apply scroll-margin-top */
+
+html {
+  scroll-padding-top: 125px;
+}

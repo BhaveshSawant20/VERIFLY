@@ -16,11 +16,14 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant",
-    });
+    // If navigating to another page, start at the top
+    if (pathname !== "/") {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant",
+      });
+    }
   }, [pathname]);
 
   return null;
@@ -31,6 +34,29 @@ function App() {
 
   const issueRef = useRef(null);
   const verifyRef = useRef(null);
+
+  /*
+   * Scroll to a section while keeping it below the navbar.
+   */
+  const scrollToSection = (ref, hash) => {
+    if (window.location.pathname !== "/") {
+      window.location.href = `/${hash}`;
+      return;
+    }
+
+    if (!ref.current) return;
+
+    const navbarHeight = 78;
+
+    const elementTop =
+      ref.current.getBoundingClientRect().top + window.scrollY;
+
+    window.scrollTo({
+      top: elementTop - navbarHeight - 20,
+      left: 0,
+      behavior: "smooth",
+    });
+  };
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -60,28 +86,43 @@ function App() {
   };
 
   const scrollToIssue = () => {
-    if (window.location.pathname !== "/") {
-      window.location.href = "/#issue";
-      return;
-    }
-
-    issueRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    scrollToSection(issueRef, "#issue");
   };
 
   const scrollToVerify = () => {
-    if (window.location.pathname !== "/") {
-      window.location.href = "/#verify";
-      return;
-    }
-
-    verifyRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    scrollToSection(verifyRef, "#verify");
   };
+
+  /*
+   * Handles /#verify and /#issue when coming from
+   * Team/Details or directly opening a URL with a hash.
+   */
+  useEffect(() => {
+    if (window.location.pathname !== "/") return;
+
+    const hash = window.location.hash;
+
+    if (!hash) return;
+
+    const timer = setTimeout(() => {
+      const element = document.getElementById(hash.substring(1));
+
+      if (!element) return;
+
+      const navbarHeight = 78;
+
+      const elementTop =
+        element.getBoundingClientRect().top + window.scrollY;
+
+      window.scrollTo({
+        top: elementTop - navbarHeight - 20,
+        left: 0,
+        behavior: "instant",
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <BrowserRouter>
@@ -89,8 +130,8 @@ function App() {
 
       <nav className="navbar">
         <Link to="/" className="logo" aria-label="VERIFLY Home">
-  <img src={veriflyLogo} alt="VERIFLY" />
-</Link>
+          <img src={veriflyLogo} alt="VERIFLY" />
+        </Link>
 
         <div className="nav-links">
           <Link to="/">Home</Link>
