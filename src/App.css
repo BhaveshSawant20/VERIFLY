@@ -88,23 +88,20 @@ a {
   z-index: 1000;
   height: 78px;
   padding: 0 7%;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
-  /* Transparent glass effect */
+  /* Transparent glass */
   background: rgba(5, 18, 12, 0.16);
 
-  /*
-    Creates a stacking context so the glass layer
-    stays inside the navbar and above page content.
-  */
   isolation: isolate;
 
   /*
-    Strong backdrop blur. The navbar remains transparent
-    while the content scrolling underneath is blurred.
+    Blurs the content passing behind the navbar.
   */
   backdrop-filter: blur(34px) saturate(135%);
   -webkit-backdrop-filter: blur(34px) saturate(135%);
@@ -115,26 +112,19 @@ a {
 }
 
 /*
-  Glass layer responsible for visibly blurring
-  whatever is behind the navbar.
+  Additional glass layer.
 */
 .navbar::before {
   content: "";
   position: absolute;
   inset: 0;
 
-  /*
-    Keep this layer lightly tinted so the blur is actually
-    visible without making the navbar look opaque.
-  */
   background: rgba(5, 18, 12, 0.22);
 
   backdrop-filter: blur(42px) saturate(140%);
   -webkit-backdrop-filter: blur(42px) saturate(140%);
 
   pointer-events: none;
-
-  /* Keep the blur layer above the page and below the content. */
   z-index: 0;
 }
 
@@ -172,52 +162,51 @@ a {
    NAV LINKS
 ======================================== */
 
-/* Both <a> and Verify/Issue buttons */
-
 .nav-links {
   display: flex;
   align-items: center;
   gap: 34px;
 }
 
+/*
+  All five navigation items:
+  Home / Verify / Issue / Team / Details
+*/
+
 .nav-links a,
 .nav-links .nav-link-button {
   position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 14px;
+
+  border: 1px solid transparent;
+  border-radius: 11px;
+
+  background: transparent;
+
   color: #b8c7bd;
+
   text-decoration: none;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   font-weight: 500;
+
   line-height: normal;
   letter-spacing: normal;
+
+  cursor: pointer;
+
   transition:
     color 0.25s ease,
-    transform 0.25s ease;
-}
-
-.nav-links a:hover,
-.nav-links .nav-link-button:hover {
-  color: #ffffff;
-  transform: scale(1.08);
-}
-
-/* Same underline for every navigation item */
-
-.nav-links a::after,
-.nav-links .nav-link-button::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -7px;
-  width: 0;
-  height: 1px;
-  background: #55d98a;
-  transition: width 0.25s ease;
-}
-
-.nav-links a:hover::after,
-.nav-links .nav-link-button:hover::after {
-  width: 100%;
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    backdrop-filter 0.25s ease;
 }
 
 /* Verify / Issue buttons */
@@ -225,58 +214,155 @@ a {
 .nav-link-button {
   appearance: none;
   -webkit-appearance: none;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
 }
 
 /* ========================================
-   ACTIVE NAVIGATION STATE
+   NAV LINK HOVER
+======================================== */
+
+.nav-links a:hover,
+.nav-links .nav-link-button:hover {
+  color: #ffffff;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  border-color: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   NAV LINK UNDERLINE
+======================================== */
+
+.nav-links a::after,
+.nav-links .nav-link-button::after {
+  content: "";
+
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 3px;
+
+  width: auto;
+  height: 1px;
+
+  background: #55d98a;
+
+  transform: scaleX(0);
+  transform-origin: center;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+
+  opacity: 0;
+}
+
+.nav-links a:hover::after,
+.nav-links .nav-link-button:hover::after {
+  transform: scaleX(1);
+  opacity: 0.8;
+}
+
+/* ========================================
+   ACTIVE NAVIGATION — GLASS EFFECT
 ======================================== */
 
 /*
-  These styles are used when App.jsx marks the currently
-  selected navigation item with className="active" or
-  aria-current="page".
+  SAME glass effect for ALL FIVE:
+
+  Home
+  Verify
+  Issue
+  Team
+  Details
 */
 
 .nav-links a.active,
 .nav-links a[aria-current="page"],
 .nav-links .nav-link-button.active,
 .nav-links .nav-link-button[aria-current="page"] {
-  color: #63d991;
-  font-weight: 700;
-  text-shadow: 0 0 14px rgba(99, 217, 145, 0.18);
+  color: #ffffff;
+
+  font-weight: 600;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.045)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  backdrop-filter: blur(16px) saturate(125%);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025),
+    0 4px 18px rgba(0, 0, 0, 0.18),
+    0 0 18px rgba(80, 255, 150, 0.07);
+
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.08);
 }
 
-.nav-links .nav-link-button.active,
-.nav-links .nav-link-button[aria-current="page"] {
-  padding: 8px 12px;
-  margin: -8px -12px;
-  border-radius: 8px;
-  background: rgba(99, 217, 145, 0.10);
-  border: 1px solid rgba(99, 217, 145, 0.20);
+/*
+  Active glass hover.
+*/
+
+.nav-links a.active:hover,
+.nav-links a[aria-current="page"]:hover,
+.nav-links .nav-link-button.active:hover,
+.nav-links .nav-link-button[aria-current="page"]:hover {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.06)
+    );
+
+  border-color: rgba(255, 255, 255, 0.21);
+
   box-shadow:
-    inset 0 1px rgba(255, 255, 255, 0.05),
-    0 0 18px rgba(99, 217, 145, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03),
+    0 6px 22px rgba(0, 0, 0, 0.22),
+    0 0 22px rgba(80, 255, 150, 0.10);
+
+  transform: translateY(-1px);
 }
+
+/*
+  Active underline.
+*/
 
 .nav-links a.active::after,
 .nav-links a[aria-current="page"]::after,
 .nav-links .nav-link-button.active::after,
 .nav-links .nav-link-button[aria-current="page"]::after {
-  width: 100%;
+  transform: scaleX(1);
+  opacity: 0.9;
+
   background: #63d991;
 }
 
-/* Focus is kept subtle; it must not look like a second active state. */
+/* ========================================
+   NAVBAR FOCUS
+======================================== */
+
 .nav-links a:focus-visible,
 .nav-links .nav-link-button:focus-visible {
   outline: 1px solid rgba(99, 217, 145, 0.55);
-  outline-offset: 5px;
-  border-radius: 4px;
+  outline-offset: 4px;
+  border-radius: 10px;
 }
 
 /* ========================================
@@ -285,17 +371,25 @@ a {
 
 .connect-btn {
   padding: 11px 19px;
+
   border: 1px solid rgba(255, 255, 255, 0.17);
   border-radius: 8px;
+
   background: rgba(255, 255, 255, 0.035);
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+
   color: #ffffff;
+
   font-size: 13px;
   font-weight: 600;
+
   cursor: pointer;
+
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.06);
+
   transition:
     transform 0.25s ease,
     background 0.25s ease,
@@ -306,6 +400,7 @@ a {
 .connect-btn:hover {
   background: rgba(99, 217, 145, 0.08);
   border-color: rgba(99, 217, 145, 0.38);
+
   transform: scale(1.05) translateY(-1px);
 }
 
@@ -316,11 +411,15 @@ a {
 .hero {
   position: relative;
   z-index: 3;
+
   min-height: calc(100vh - 78px);
+
   padding: 80px 7% 70px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 80px;
 }
 
@@ -331,8 +430,11 @@ a {
 .eyebrow {
   display: inline-flex;
   align-items: center;
+
   margin-bottom: 25px;
+
   color: #63d991;
+
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2.5px;
@@ -340,19 +442,26 @@ a {
 
 .eyebrow::before {
   content: "";
+
   width: 28px;
   height: 1px;
+
   margin-right: 12px;
+
   background: #63d991;
 }
 
 .hero h1 {
   max-width: 700px;
+
   font-family: "Space Grotesk", sans-serif;
+
   font-size: clamp(48px, 5.5vw, 76px);
   font-weight: 600;
+
   letter-spacing: -4px;
   line-height: 0.98;
+
   margin-bottom: 28px;
 }
 
@@ -362,9 +471,12 @@ a {
 
 .hero-description {
   max-width: 570px;
+
   color: #b9c8bd;
+
   font-size: 17px;
   line-height: 1.7;
+
   margin-bottom: 34px;
 }
 
@@ -375,23 +487,29 @@ a {
 .hero-buttons {
   display: flex;
   align-items: center;
+
   gap: 13px;
+
   margin-bottom: 45px;
 }
-
-/* Main green button */
 
 .primary-btn,
 .secondary-btn {
   min-width: 185px;
+
   padding: 14px 19px;
+
   border-radius: 8px;
+
   font-size: 14px;
   font-weight: 600;
+
   cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   transition:
     transform 0.25s ease,
     background 0.25s ease,
@@ -401,15 +519,20 @@ a {
 
 .primary-btn {
   border: 1px solid rgba(99, 217, 145, 0.9);
+
   background: rgba(99, 217, 145, 0.88);
+
   color: #06110c;
+
   box-shadow:
     0 8px 30px rgba(99, 217, 145, 0.08);
 }
 
 .primary-btn:hover {
   transform: scale(1.045) translateY(-2px);
+
   background: rgba(114, 229, 160, 0.95);
+
   box-shadow:
     0 12px 35px rgba(99, 217, 145, 0.18);
 }
@@ -418,21 +541,25 @@ a {
   font-size: 19px;
 }
 
-/* Transparent glass button */
-
 .secondary-btn {
   border: 1px solid rgba(255, 255, 255, 0.18);
+
   background: rgba(255, 255, 255, 0.02);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+
   color: #ffffff;
+
   box-shadow:
     inset 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .secondary-btn:hover {
   background: rgba(255, 255, 255, 0.065);
+
   border-color: rgba(255, 255, 255, 0.28);
+
   transform: scale(1.045) translateY(-2px);
 }
 
@@ -448,13 +575,16 @@ a {
 .trust-line {
   display: flex;
   align-items: center;
+
   gap: 22px;
 }
 
 .trust-item {
   display: flex;
   flex-direction: column;
+
   gap: 5px;
+
   transition:
     transform 0.25s ease,
     opacity 0.25s ease;
@@ -478,6 +608,7 @@ a {
 .divider {
   height: 30px;
   width: 1px;
+
   background: rgba(255, 255, 255, 0.13);
 }
 
@@ -488,20 +619,26 @@ a {
 .verification-card {
   width: 370px;
   min-width: 370px;
+
   padding: 28px;
+
   border: 1px solid rgba(255, 255, 255, 0.15);
+
   background:
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.045),
       rgba(255, 255, 255, 0.008)
     );
+
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.25),
     inset 0 1px rgba(255, 255, 255, 0.08),
     inset 0 -1px rgba(255, 255, 255, 0.02);
+
   transition:
     transform 0.3s ease,
     border-color 0.3s ease,
@@ -510,7 +647,9 @@ a {
 
 .verification-card:hover {
   transform: scale(1.025) translateY(-4px);
+
   border-color: rgba(99, 217, 145, 0.3);
+
   box-shadow:
     0 35px 90px rgba(0, 0, 0, 0.3),
     0 0 35px rgba(99, 217, 145, 0.05),
@@ -521,7 +660,9 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   color: #829188;
+
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.5px;
@@ -529,31 +670,44 @@ a {
 
 .status {
   color: #63d991;
+
   display: flex;
   align-items: center;
+
   gap: 6px;
 }
 
 .status i {
   width: 6px;
   height: 6px;
+
   border-radius: 50%;
+
   background: #63d991;
+
   box-shadow: 0 0 10px #63d991;
 }
 
 .certificate-symbol {
   width: 70px;
   height: 70px;
+
   margin: 45px auto 24px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border: 1px solid rgba(99, 217, 145, 0.45);
+
   border-radius: 50%;
+
   color: #63d991;
+
   font-size: 30px;
+
   background: rgba(99, 217, 145, 0.025);
+
   box-shadow:
     0 0 30px rgba(99, 217, 145, 0.08),
     inset 0 0 20px rgba(99, 217, 145, 0.04);
@@ -561,25 +715,34 @@ a {
 
 .card-label {
   text-align: center;
+
   color: #728178;
+
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 2px;
+
   margin-bottom: 8px;
 }
 
 .verification-card h2 {
   text-align: center;
+
   font-family: "Space Grotesk", sans-serif;
+
   font-size: 30px;
   font-weight: 600;
+
   color: #63d991;
+
   margin-bottom: 13px;
 }
 
 .card-description {
   color: #9cab9f;
+
   text-align: center;
+
   font-size: 13px;
   line-height: 1.6;
 }
@@ -590,12 +753,18 @@ a {
 
 .record-box {
   margin-top: 28px;
+
   padding: 15px;
+
   display: flex;
   justify-content: space-between;
+
   border-radius: 9px;
+
   background: rgba(255, 255, 255, 0.018);
+
   border: 1px solid rgba(255, 255, 255, 0.07);
+
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -624,22 +793,29 @@ a {
 
 .page {
   min-height: calc(100vh - 78px);
+
   padding: 30px 7% 100px;
+
   position: relative;
   z-index: 3;
+
   background: #06110c;
 }
 
 .page h1 {
   font-family: "Space Grotesk", sans-serif;
+
   font-size: 56px;
   letter-spacing: -2px;
+
   margin-bottom: 20px;
 }
 
 .page p {
   max-width: 650px;
+
   color: #aebdb3;
+
   font-size: 17px;
   line-height: 1.7;
 }
@@ -650,10 +826,14 @@ a {
 
 .team-page {
   min-height: calc(100vh - 78px);
+
   padding: 30px 7% 100px;
+
   position: relative;
   z-index: 3;
+
   overflow: hidden;
+
   background: #06110c;
 }
 
@@ -665,8 +845,11 @@ a {
 .team-eyebrow {
   display: inline-flex;
   align-items: center;
+
   margin-bottom: 22px;
+
   color: #63d991;
+
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2.5px;
@@ -674,18 +857,24 @@ a {
 
 .team-eyebrow::before {
   content: "";
+
   width: 28px;
   height: 1px;
+
   margin-right: 12px;
+
   background: #63d991;
 }
 
 .team-header h1 {
   font-family: "Space Grotesk", sans-serif;
+
   font-size: clamp(48px, 5vw, 68px);
   font-weight: 600;
+
   letter-spacing: -3px;
   line-height: 1;
+
   margin-bottom: 22px;
 }
 
@@ -695,7 +884,9 @@ a {
 
 .team-header p {
   max-width: 620px;
+
   color: #9eada3;
+
   font-size: 16px;
   line-height: 1.7;
 }
@@ -706,8 +897,11 @@ a {
 
 .team-grid {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 22px;
+
   max-width: 1200px;
 }
 
@@ -717,20 +911,27 @@ a {
 
 .team-card {
   min-height: 500px;
+
   overflow: hidden;
+
   border: 1px solid rgba(255, 255, 255, 0.11);
+
   border-radius: 18px;
+
   background:
     linear-gradient(
       135deg,
       rgba(255, 255, 255, 0.045),
       rgba(255, 255, 255, 0.008)
     );
+
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.2),
     inset 0 1px rgba(255, 255, 255, 0.06);
+
   transition:
     transform 0.3s ease,
     border-color 0.3s ease,
@@ -739,7 +940,9 @@ a {
 
 .team-card:hover {
   transform: scale(1.025) translateY(-5px);
+
   border-color: rgba(99, 217, 145, 0.35);
+
   box-shadow:
     0 35px 90px rgba(0, 0, 0, 0.3),
     0 0 40px rgba(99, 217, 145, 0.06),
@@ -752,9 +955,12 @@ a {
 
 .team-image-link {
   display: flex;
+
   justify-content: center;
   align-items: center;
+
   text-decoration: none;
+
   padding-top: 35px;
   padding-bottom: 15px;
 }
@@ -762,19 +968,26 @@ a {
 .team-image-wrapper {
   width: 190px;
   height: 190px;
+
   position: relative;
+
   border-radius: 50%;
+
   overflow: visible;
+
   border: 2px solid rgba(99, 217, 145, 0.7);
+
   background:
     radial-gradient(
       circle,
       rgba(99, 217, 145, 0.12),
       rgba(99, 217, 145, 0.015)
     );
+
   box-shadow:
     0 0 25px rgba(99, 217, 145, 0.12),
     inset 0 0 25px rgba(99, 217, 145, 0.05);
+
   transition:
     transform 0.35s ease,
     box-shadow 0.35s ease;
@@ -782,6 +995,7 @@ a {
 
 .team-image-link:hover .team-image-wrapper {
   transform: scale(1.07);
+
   box-shadow:
     0 0 40px rgba(99, 217, 145, 0.2),
     inset 0 0 30px rgba(99, 217, 145, 0.08);
@@ -790,9 +1004,13 @@ a {
 .team-image {
   width: 100%;
   height: 100%;
+
   display: block;
+
   object-fit: cover;
+
   border-radius: 50%;
+
   transition: transform 0.4s ease;
 }
 
@@ -806,22 +1024,33 @@ a {
 
 .linkedin-badge {
   position: absolute;
+
   right: -8px;
   bottom: 8px;
+
   width: 42px;
   height: 42px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 50%;
+
   border: 2px solid #06110c;
+
   background: #63d991;
+
   color: #06110c;
+
   font-family: Arial, sans-serif;
+
   font-size: 20px;
   font-weight: 800;
+
   box-shadow:
     0 5px 20px rgba(99, 217, 145, 0.3);
+
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease;
@@ -829,6 +1058,7 @@ a {
 
 .team-image-link:hover .linkedin-badge {
   transform: scale(1.15);
+
   box-shadow:
     0 8px 25px rgba(99, 217, 145, 0.45);
 }
@@ -839,24 +1069,36 @@ a {
 
 .team-info {
   padding: 20px 28px 30px;
+
   text-align: center;
+
   display: flex;
   flex-direction: column;
+
   height: calc(100% - 240px);
 }
 
 .team-role {
   display: inline-block;
+
   align-self: center;
+
   padding: 6px 14px;
+
   border: 1px solid rgba(99, 217, 145, 0.45);
+
   border-radius: 30px;
+
   color: #63d991;
+
   background: rgba(99, 217, 145, 0.035);
+
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.6px;
+
   text-transform: uppercase;
+
   transition:
     transform 0.25s ease,
     background 0.25s ease;
@@ -864,31 +1106,41 @@ a {
 
 .team-card:hover .team-role {
   transform: scale(1.05);
+
   background: rgba(99, 217, 145, 0.08);
 }
 
 .team-info h2 {
   margin-top: 13px;
   margin-bottom: 6px;
+
   font-family: "Space Grotesk", sans-serif;
+
   font-size: 24px;
   font-weight: 600;
+
   letter-spacing: -0.7px;
 }
 
 .team-ien {
   color: #64736a;
+
   font-size: 10px;
   font-weight: 600;
+
   letter-spacing: 1.5px;
 }
 
 .team-line {
   width: 36px;
   height: 1px;
+
   margin: 18px auto 15px;
+
   background: #63d991;
+
   opacity: 0.8;
+
   transition:
     width 0.3s ease,
     box-shadow 0.3s ease;
@@ -896,28 +1148,39 @@ a {
 
 .team-card:hover .team-line {
   width: 55px;
+
   box-shadow:
     0 0 10px rgba(99, 217, 145, 0.5);
 }
 
 .team-info p {
   margin: 0 auto;
+
   max-width: 300px;
+
   color: #94a39a;
+
   font-size: 13px;
   line-height: 1.65;
 }
 
 .team-link {
   margin-top: auto;
+
   align-self: center;
+
   display: inline-flex;
   align-items: center;
+
   gap: 6px;
+
   color: #63d991;
+
   font-size: 12px;
   font-weight: 600;
+
   text-decoration: none;
+
   transition:
     color 0.25s ease,
     transform 0.25s ease;
@@ -925,6 +1188,7 @@ a {
 
 .team-link:hover {
   color: #ffffff;
+
   transform: translateX(3px);
 }
 
@@ -938,12 +1202,15 @@ a {
 
 .workspace {
   width: min(1200px, 92%);
+
   margin: 20px auto 100px;
+
   display: grid;
+
   grid-template-columns: repeat(2, 1fr);
+
   gap: 28px;
 
-  /* Keeps Verify / Issue section below the navbar */
   scroll-margin-top: 125px;
 
   position: relative;
@@ -952,13 +1219,19 @@ a {
 
 .workspace-card {
   padding: 36px;
+
   border: 1px solid rgba(99, 217, 145, 0.15);
+
   border-radius: 24px;
+
   background: rgba(8, 18, 14, 0.48);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.18);
+
   transition:
     transform 0.3s ease,
     border-color 0.3s ease;
@@ -966,6 +1239,7 @@ a {
 
 .workspace-card:hover {
   transform: scale(1.025);
+
   border-color: rgba(99, 217, 145, 0.35);
 }
 
@@ -977,13 +1251,17 @@ a {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
+
   color: #63d991;
 }
 
 .workspace-header h2 {
   margin: 8px 0 10px;
+
   font-family: "Space Grotesk", sans-serif;
+
   font-size: 32px;
+
   color: white;
 }
 
@@ -993,7 +1271,9 @@ a {
 
 .workspace-header p {
   margin: 0;
+
   color: rgba(255, 255, 255, 0.58);
+
   line-height: 1.6;
 }
 
@@ -1004,20 +1284,31 @@ a {
 .certificate-form {
   display: flex;
   flex-direction: column;
+
   gap: 13px;
 }
 
 .certificate-form input {
   width: 100%;
+
   box-sizing: border-box;
+
   padding: 15px 16px;
+
   border-radius: 12px;
+
   border: 1px solid rgba(255, 255, 255, 0.1);
+
   outline: none;
+
   background: rgba(255, 255, 255, 0.045);
+
   color: white;
+
   font-family: "DM Sans", sans-serif;
+
   font-size: 14px;
+
   transition: 0.25s ease;
 }
 
@@ -1027,12 +1318,15 @@ a {
 
 .certificate-form input:focus {
   border-color: rgba(99, 217, 145, 0.55);
+
   background: rgba(99, 217, 145, 0.05);
 }
 
 .form-btn {
   width: 100%;
+
   margin-top: 6px;
+
   justify-content: center;
 }
 
@@ -1042,12 +1336,19 @@ a {
 
 .status-message {
   margin-top: 18px;
+
   padding: 13px 15px;
+
   border-radius: 10px;
+
   background: rgba(99, 217, 145, 0.08);
+
   border: 1px solid rgba(99, 217, 145, 0.15);
+
   color: rgba(255, 255, 255, 0.75);
+
   font-size: 13px;
+
   line-height: 1.5;
 }
 
@@ -1057,27 +1358,40 @@ a {
 
 .hash-box {
   margin-top: 12px;
+
   padding: 14px;
+
   border-radius: 12px;
+
   background: rgba(0, 0, 0, 0.25);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   overflow: hidden;
 }
 
 .hash-box span {
   display: block;
+
   margin-bottom: 8px;
+
   color: #63d991;
+
   font-size: 11px;
   font-weight: 700;
+
   letter-spacing: 1px;
 }
 
 .hash-box code {
   display: block;
+
   color: rgba(255, 255, 255, 0.65);
+
   font-size: 11px;
+
   line-height: 1.6;
+
   word-break: break-all;
 }
 
@@ -1087,13 +1401,21 @@ a {
 
 .verification-result {
   width: 100%;
+
   margin-top: 24px;
+
   padding: 22px;
+
   border-radius: 16px;
+
   text-align: center;
+
   font-family: "DM Sans", sans-serif;
+
   font-weight: 700;
+
   letter-spacing: 1px;
+
   transition: all 0.3s ease;
 }
 
@@ -1101,21 +1423,26 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+
   gap: 12px;
 }
 
 .result-heading strong {
   font-size: 16px;
+
   letter-spacing: 0.6px;
 }
 
 .result-icon {
   width: 32px;
   height: 32px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 50%;
+
   font-size: 17px;
   font-weight: 800;
 }
@@ -1126,7 +1453,9 @@ a {
 
 .verification-result.authentic {
   background: rgba(99, 217, 145, 0.08);
+
   border: 1px solid rgba(99, 217, 145, 0.25);
+
   color: #63d991;
 }
 
@@ -1136,7 +1465,9 @@ a {
 
 .verification-result.authentic .result-icon {
   color: #63d991;
+
   background: rgba(99, 217, 145, 0.15);
+
   border: 1px solid rgba(99, 217, 145, 0.35);
 }
 
@@ -1146,7 +1477,9 @@ a {
 
 .verification-result.invalid {
   background: rgba(255, 107, 107, 0.08);
+
   border: 1px solid rgba(255, 107, 107, 0.25);
+
   color: #ff6b6b;
 }
 
@@ -1156,7 +1489,9 @@ a {
 
 .verification-result.invalid .result-icon {
   color: #ff6b6b;
+
   background: rgba(255, 107, 107, 0.15);
+
   border: 1px solid rgba(255, 107, 107, 0.35);
 }
 
@@ -1166,7 +1501,9 @@ a {
 
 .verification-result.not-found {
   background: rgba(245, 184, 75, 0.08);
+
   border: 1px solid rgba(245, 184, 75, 0.25);
+
   color: #f5b84b;
 }
 
@@ -1176,7 +1513,9 @@ a {
 
 .verification-result.not-found .result-icon {
   color: #f5b84b;
+
   background: rgba(245, 184, 75, 0.15);
+
   border: 1px solid rgba(245, 184, 75, 0.35);
 }
 
@@ -1186,17 +1525,24 @@ a {
 
 .certificate-result {
   margin-top: 15px;
+
   display: grid;
+
   gap: 10px;
 }
 
 .certificate-result > div {
   display: flex;
   justify-content: space-between;
+
   gap: 20px;
+
   padding: 13px 15px;
+
   border-radius: 10px;
+
   background: rgba(255, 255, 255, 0.035);
+
   transition: transform 0.25s ease;
 }
 
@@ -1206,13 +1552,17 @@ a {
 
 .certificate-result span {
   color: rgba(255, 255, 255, 0.4);
+
   font-size: 12px;
 }
 
 .certificate-result strong {
   color: rgba(255, 255, 255, 0.8);
+
   font-size: 12px;
+
   text-align: right;
+
   word-break: break-all;
 }
 
@@ -1222,11 +1572,17 @@ a {
 
 .transaction-box {
   width: 100%;
+
   margin-top: 18px;
+
   padding: 20px;
+
   border: 1px solid rgba(99, 217, 145, 0.18);
+
   border-radius: 16px;
+
   background: rgba(99, 217, 145, 0.035);
+
   font-family: "DM Sans", sans-serif;
 }
 
@@ -1234,63 +1590,87 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   margin-bottom: 18px;
 }
 
 .transaction-header > span:first-child {
   color: #63d991;
+
   font-size: 11px;
   font-weight: 700;
+
   letter-spacing: 1px;
 }
 
 .transaction-network {
   padding: 5px 9px;
+
   border: 1px solid rgba(99, 217, 145, 0.2);
+
   border-radius: 6px;
+
   color: #9eafa5;
+
   font-size: 10px;
   font-weight: 600;
+
   letter-spacing: 0.8px;
 }
 
 .transaction-hash {
   display: flex;
   flex-direction: column;
+
   gap: 7px;
 }
 
 .transaction-hash span {
   color: #899990;
+
   font-size: 11px;
   font-weight: 500;
 }
 
 .transaction-hash code {
   display: block;
+
   padding: 11px 12px;
+
   border-radius: 8px;
+
   background: rgba(0, 0, 0, 0.18);
+
   color: #b8c7bd;
+
   font-family: monospace;
+
   font-size: 11px;
+
   word-break: break-all;
 }
 
 .etherscan-link {
   display: inline-flex;
   align-items: center;
+
   gap: 7px;
+
   margin-top: 16px;
+
   color: #63d991;
+
   font-size: 12px;
   font-weight: 600;
+
   text-decoration: none;
+
   transition: all 0.25s ease;
 }
 
 .etherscan-link:hover {
   color: #ffffff;
+
   transform: translateX(3px);
 }
 
@@ -1300,21 +1680,23 @@ a {
 
 /* ========================================
    VERIFLY PAGE SIGNATURE
-
-   Normal document-flow signature.
-   NOT fixed.
-   NOT sticky.
 ======================================== */
 
 .verifly-mark {
   width: calc(100% - 80px);
+
   max-width: 1400px;
+
   margin: 90px auto 30px;
+
   padding-top: 18px;
+
   border-top: 1px solid rgba(255, 255, 255, 0.14);
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 30px;
 }
 
@@ -1324,9 +1706,12 @@ a {
     "Fira Code",
     "Courier New",
     monospace;
+
   font-size: 14px;
   font-weight: 700;
+
   letter-spacing: 2.5px;
+
   color: rgba(255, 255, 255, 0.72);
 }
 
@@ -1336,9 +1721,12 @@ a {
     "Fira Code",
     "Courier New",
     monospace;
+
   font-size: 10px;
   font-weight: 500;
+
   letter-spacing: 0.8px;
+
   color: rgba(255, 255, 255, 0.38);
 }
 
@@ -1348,35 +1736,47 @@ a {
 
 .details-page {
   max-width: 1400px;
+
   margin: 0 auto;
+
   padding-top: 0;
   padding-bottom: 40px;
 }
 
 .details-header {
   max-width: 900px;
+
   margin: 0 auto 70px;
+
   text-align: center;
 }
 
 .details-eyebrow {
   display: inline-block;
+
   margin-bottom: 18px;
+
   font-family:
     "JetBrains Mono",
     "Fira Code",
     "Courier New",
     monospace;
+
   font-size: 10px;
   font-weight: 600;
+
   letter-spacing: 2.5px;
+
   color: rgba(255, 255, 255, 0.38);
 }
 
 .details-header h1 {
   margin: 0;
+
   font-size: clamp(42px, 6vw, 76px);
+
   line-height: 1;
+
   letter-spacing: -3px;
 }
 
@@ -1386,9 +1786,13 @@ a {
 
 .details-header p {
   max-width: 720px;
+
   margin: 28px auto 0;
+
   font-size: 15px;
+
   line-height: 1.8;
+
   color: rgba(255, 255, 255, 0.52);
 }
 
@@ -1398,21 +1802,29 @@ a {
 
 .details-section {
   width: calc(100% - 80px);
+
   max-width: 1200px;
+
   margin: 0 auto 75px;
 }
 
 .details-section h2 {
   margin: 0 0 22px;
+
   font-size: 28px;
+
   letter-spacing: -0.8px;
 }
 
 .details-section > p {
   max-width: 1000px;
+
   margin: 0 0 18px;
+
   font-size: 14px;
+
   line-height: 1.85;
+
   color: rgba(255, 255, 255, 0.52);
 }
 
@@ -1422,43 +1834,58 @@ a {
 
 .details-flow {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   gap: 14px;
 }
 
 .details-step {
   min-height: 190px;
+
   padding: 24px;
+
   border: 1px solid rgba(255, 255, 255, 0.09);
+
   background: rgba(255, 255, 255, 0.025);
+
   transition: 0.25s ease;
 }
 
 .details-step:hover {
   border-color: rgba(255, 255, 255, 0.2);
+
   transform: translateY(-3px);
 }
 
 .details-step > span {
   display: block;
+
   margin-bottom: 28px;
+
   font-family:
     "JetBrains Mono",
     "Fira Code",
     monospace;
+
   font-size: 11px;
+
   color: rgba(255, 255, 255, 0.35);
 }
 
 .details-step h3 {
   margin: 0 0 12px;
+
   font-size: 16px;
 }
 
 .details-step p {
   margin: 0;
+
   font-size: 12px;
+
   line-height: 1.7;
+
   color: rgba(255, 255, 255, 0.43);
 }
 
@@ -1468,16 +1895,23 @@ a {
 
 .tech-grid {
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 12px;
 }
 
 .tech-item {
   display: flex;
+
   flex-direction: column;
+
   gap: 8px;
+
   padding: 22px;
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   background: rgba(255, 255, 255, 0.02);
 }
 
@@ -1490,7 +1924,9 @@ a {
     "JetBrains Mono",
     "Fira Code",
     monospace;
+
   font-size: 11px;
+
   color: rgba(255, 255, 255, 0.4);
 }
 
@@ -1508,26 +1944,39 @@ a {
 
 .paper-list {
   display: flex;
+
   flex-direction: column;
+
   gap: 10px;
 }
 
 .paper-card {
   position: relative;
+
   display: grid;
+
   grid-template-columns: 50px 1fr 30px;
+
   align-items: center;
+
   gap: 20px;
+
   padding: 22px 24px;
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   background: rgba(255, 255, 255, 0.02);
+
   text-decoration: none;
+
   transition: 0.25s ease;
 }
 
 .paper-card:hover {
   border-color: rgba(255, 255, 255, 0.2);
+
   background: rgba(255, 255, 255, 0.04);
+
   transform: translateX(4px);
 }
 
@@ -1536,29 +1985,38 @@ a {
     "JetBrains Mono",
     "Fira Code",
     monospace;
+
   font-size: 11px;
+
   color: rgba(255, 255, 255, 0.3);
 }
 
 .paper-card p {
   margin: 0;
+
   font-family:
     "Times New Roman",
     Georgia,
     serif;
+
   font-size: 14px;
+
   line-height: 1.65;
+
   color: rgba(255, 255, 255, 0.68);
 }
 
 .paper-arrow {
   font-size: 18px;
+
   color: rgba(255, 255, 255, 0.35);
+
   transition: 0.2s ease;
 }
 
 .paper-card:hover .paper-arrow {
   color: #ffffff;
+
   transform: translate(2px, -2px);
 }
 
@@ -1568,17 +2026,25 @@ a {
 
 .project-info-grid {
   display: grid;
+
   grid-template-columns: repeat(4, 1fr);
+
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+
   border-left: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .project-info-grid > div {
   display: flex;
+
   flex-direction: column;
+
   gap: 10px;
+
   padding: 22px;
+
   border-right: 1px solid rgba(255, 255, 255, 0.08);
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1587,14 +2053,19 @@ a {
     "JetBrains Mono",
     "Fira Code",
     monospace;
+
   font-size: 9px;
+
   letter-spacing: 1.5px;
+
   color: rgba(255, 255, 255, 0.3);
+
   text-transform: uppercase;
 }
 
 .project-info-grid strong {
   font-size: 13px;
+
   font-weight: 500;
 }
 
@@ -1606,28 +2077,41 @@ a {
 .team-page::before,
 .page::before {
   content: "";
+
   position: absolute;
+
   inset: 0;
+
   background-image:
     linear-gradient(
       rgba(3, 16, 10, 0.42),
       rgba(3, 16, 10, 0.42)
     ),
     url("./background.png");
+
   background-size: cover;
+
   background-position: center;
+
   background-attachment: fixed;
+
   background-repeat: no-repeat;
+
   opacity: 0.5;
+
   z-index: 0;
+
   pointer-events: none;
 }
 
 .team-page::after,
 .page::after {
   content: "";
+
   position: absolute;
+
   inset: 0;
+
   background:
     radial-gradient(
       circle at 75% 45%,
@@ -1640,16 +2124,18 @@ a {
       rgba(4, 15, 10, 0.42) 55%,
       rgba(4, 15, 10, 0.22) 100%
     );
+
   z-index: 1;
+
   pointer-events: none;
 }
 
-/* Keep all Team and Details content above
-   the background image and overlay. */
+/* Keep all Team and Details content above background */
 
 .team-page > *,
 .page > * {
   position: relative;
+
   z-index: 3;
 }
 
@@ -1659,19 +2145,26 @@ a {
 
 .app .verifly-mark {
   opacity: 1 !important;
+
   filter: none !important;
+
   position: relative;
+
   z-index: 10;
 }
 
 .app .verifly-mark-brand {
   opacity: 1 !important;
+
   color: #f4fff8 !important;
-  text-shadow: 0 0 18px rgba(80, 255, 150, 0.18);
+
+  text-shadow:
+    0 0 18px rgba(80, 255, 150, 0.18);
 }
 
 .app .verifly-mark-tagline {
   opacity: 1 !important;
+
   color: rgba(225, 245, 233, 0.95) !important;
 }
 
@@ -1686,13 +2179,17 @@ a {
 
   .hero {
     flex-direction: column;
+
     align-items: flex-start;
+
     padding-top: 60px;
   }
 
   .verification-card {
     width: 100%;
+
     max-width: 400px;
+
     min-width: 0;
   }
 }
@@ -1753,6 +2250,7 @@ a {
 @media (max-width: 600px) {
   .workspace {
     width: 92%;
+
     margin-top: 10px;
   }
 
@@ -1766,6 +2264,7 @@ a {
 
   .certificate-result > div {
     flex-direction: column;
+
     gap: 5px;
   }
 
@@ -1779,11 +2278,13 @@ a {
 
   .details-header h1 {
     font-size: 42px;
+
     letter-spacing: -2px;
   }
 
   .details-section {
     width: calc(100% - 40px);
+
     margin-bottom: 55px;
   }
 
@@ -1795,7 +2296,9 @@ a {
 
   .paper-card {
     grid-template-columns: 30px 1fr 20px;
+
     gap: 12px;
+
     padding: 18px;
   }
 
@@ -1805,19 +2308,25 @@ a {
 
   .verifly-mark {
     width: calc(100% - 40px);
+
     margin: 60px auto 20px;
+
     padding-top: 14px;
+
     gap: 15px;
   }
 
   .verifly-mark-brand {
     font-size: 11px;
+
     letter-spacing: 2px;
   }
 
   .verifly-mark-tagline {
     font-size: 8px;
+
     letter-spacing: 0.4px;
+
     text-align: right;
   }
 }
@@ -1826,23 +2335,14 @@ a {
    VERIFY / ISSUE SCROLL POSITION
 ======================================== */
 
-/*
-  Keeps the Verify / Issue workspace below
-  the sticky navbar when scrolling.
-*/
-
 .workspace {
   scroll-margin-top: 125px;
 }
 
-/*
-  Extra protection for browsers that don't
-  properly apply scroll-margin-top.
-*/
-
 html {
   scroll-padding-top: 125px;
 }
+
 /* ========================================
    BACKDROP BLUR FALLBACK
 ======================================== */
