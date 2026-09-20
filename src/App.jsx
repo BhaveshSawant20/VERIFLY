@@ -16,6 +16,10 @@ import Team from "./pages/Team";
 import Details from "./pages/Details";
 
 
+/* ========================================
+   SCROLL TO TOP
+======================================== */
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -35,21 +39,30 @@ function ScrollToTop() {
 }
 
 
-function App() {
+/* ========================================
+   MAIN APP CONTENT
+======================================== */
+
+function AppContent() {
+  const location = useLocation();
+
   const [account, setAccount] = useState(null);
   const [activeSection, setActiveSection] = useState("home");
 
   const issueRef = useRef(null);
   const verifyRef = useRef(null);
 
-  // Prevent the scroll listener from immediately
-  // overriding the button we just selected.
+  /*
+   * Prevent the scroll listener from immediately
+   * overriding the button we just selected.
+   */
   const navigationLock = useRef(false);
 
 
-  /*
-   * Get the actual position of a section.
-   */
+  /* ========================================
+     GET SECTION POSITION
+  ======================================== */
+
   const getSectionTop = (element) => {
     if (!element) return null;
 
@@ -60,11 +73,23 @@ function App() {
   };
 
 
-  /*
-   * Scroll to Verify / Issue section.
-   */
-  const scrollToSection = (ref, hash, sectionName) => {
-    if (window.location.pathname !== "/") {
+  /* ========================================
+     SCROLL TO VERIFY / ISSUE
+  ======================================== */
+
+  const scrollToSection = (
+    ref,
+    hash,
+    sectionName
+  ) => {
+    /*
+     * If currently on Team or Details,
+     * navigate back to Home first.
+     *
+     * The hash will then be handled by
+     * the Home page effect.
+     */
+    if (location.pathname !== "/") {
       window.location.href = `/${hash}`;
       return;
     }
@@ -72,23 +97,37 @@ function App() {
     if (!ref.current) return;
 
     const navbarHeight = 78;
-    const elementTop = getSectionTop(ref.current);
+
+    const elementTop =
+      getSectionTop(ref.current);
 
     if (elementTop === null) return;
 
-    // Immediately show the correct active button.
+    /*
+     * Immediately activate the selected
+     * navigation button.
+     */
     setActiveSection(sectionName);
 
-    // Prevent scroll detection from changing it
-    // while smooth scrolling is happening.
+    /*
+     * Prevent the scroll listener from
+     * changing the active state while
+     * smooth scrolling.
+     */
     navigationLock.current = true;
 
+    /*
+     * Update URL.
+     */
     window.history.replaceState(
       null,
       "",
       `/${hash}`
     );
 
+    /*
+     * Scroll to section.
+     */
     window.scrollTo({
       top: Math.max(
         0,
@@ -98,34 +137,51 @@ function App() {
       behavior: "smooth",
     });
 
-    // Release the lock after smooth scrolling.
+    /*
+     * Release scroll lock after animation.
+     */
     setTimeout(() => {
       navigationLock.current = false;
     }, 900);
   };
 
 
-  /*
-   * Always return to the very top when Home is clicked.
-   */
+  /* ========================================
+     HOME BUTTON
+  ======================================== */
+
   const handleHomeClick = (event) => {
-    if (window.location.pathname === "/") {
+    /*
+     * If already on Home,
+     * prevent React Router navigation
+     * and smoothly return to the top.
+     */
+    if (location.pathname === "/") {
       event.preventDefault();
 
-      // Remove #verify / #issue from the URL.
+      /*
+       * Remove #verify / #issue.
+       */
       window.history.replaceState(
         null,
         "",
         "/"
       );
 
-      // Immediately make Home active.
+      /*
+       * Home becomes active immediately.
+       */
       setActiveSection("home");
 
-      // Lock active-section detection while scrolling.
+      /*
+       * Prevent scroll detection from
+       * changing the active state.
+       */
       navigationLock.current = true;
 
-      // Scroll completely to the top.
+      /*
+       * Scroll completely to the top.
+       */
       window.scrollTo({
         top: 0,
         left: 0,
@@ -136,21 +192,25 @@ function App() {
         navigationLock.current = false;
       }, 900);
     } else {
-      // When coming from Team or Details,
-      // Home should become active.
+      /*
+       * We are navigating from Team/Details
+       * back to Home.
+       */
       setActiveSection("home");
     }
   };
 
 
-  /*
-   * Connect MetaMask wallet.
-   */
+  /* ========================================
+     CONNECT METAMASK
+  ======================================== */
+
   const connectWallet = async () => {
     if (!window.ethereum) {
       alert(
         "MetaMask is not installed. Please install the MetaMask browser extension to connect your wallet."
       );
+
       return;
     }
 
@@ -170,17 +230,22 @@ function App() {
       );
 
       if (error.code === 4001) {
-        alert("Wallet connection was rejected.");
+        alert(
+          "Wallet connection was rejected."
+        );
       } else {
-        alert("Unable to connect wallet.");
+        alert(
+          "Unable to connect wallet."
+        );
       }
     }
   };
 
 
-  /*
-   * Verify button.
-   */
+  /* ========================================
+     VERIFY BUTTON
+  ======================================== */
+
   const scrollToVerify = () => {
     scrollToSection(
       verifyRef,
@@ -190,9 +255,10 @@ function App() {
   };
 
 
-  /*
-   * Issue button.
-   */
+  /* ========================================
+     ISSUE BUTTON
+  ======================================== */
+
   const scrollToIssue = () => {
     scrollToSection(
       issueRef,
@@ -202,24 +268,59 @@ function App() {
   };
 
 
+  /* ========================================
+     ROUTE ACTIVE STATE
+  ======================================== */
+
   /*
-   * Handle #verify and #issue when:
+   * Team and Details are real pages.
    *
-   * /#verify
-   * /#issue
+   * When entering those pages, they become
+   * the ONLY active navigation item.
    *
-   * is opened directly or when coming
-   * from another page.
+   * Home / Verify / Issue are only allowed
+   * to be active on "/".
    */
   useEffect(() => {
-    if (window.location.pathname !== "/") {
+    if (location.pathname === "/team") {
+      setActiveSection("team");
+      return;
+    }
+
+    if (location.pathname === "/details") {
+      setActiveSection("details");
+      return;
+    }
+
+    if (location.pathname === "/") {
+      const hash = window.location.hash;
+
+      if (hash === "#verify") {
+        setActiveSection("verify");
+      } else if (hash === "#issue") {
+        setActiveSection("issue");
+      } else {
+        setActiveSection("home");
+      }
+    }
+  }, [location.pathname]);
+
+
+  /* ========================================
+     HANDLE DIRECT HASH NAVIGATION
+  ======================================== */
+
+  useEffect(() => {
+    /*
+     * Hash navigation only applies to Home.
+     */
+    if (location.pathname !== "/") {
       return;
     }
 
     const hash = window.location.hash;
 
     if (!hash) {
-      setActiveSection("home");
       return;
     }
 
@@ -232,6 +333,9 @@ function App() {
 
     setActiveSection(sectionName);
 
+    /*
+     * Wait for Home component to render.
+     */
     const timer = setTimeout(() => {
       const element =
         document.getElementById(
@@ -256,29 +360,45 @@ function App() {
       });
     }, 150);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [location.pathname]);
 
 
-  /*
-   * Keep navbar active state synchronized
-   * with manual scrolling.
-   *
-   * This version DOES NOT assume that Verify
-   * comes before Issue or vice versa.
-   */
+  /* ========================================
+     SCROLL ACTIVE STATE
+  ======================================== */
+
   useEffect(() => {
-    if (window.location.pathname !== "/") {
+    /*
+     * Scroll detection ONLY runs on Home.
+     */
+    if (location.pathname !== "/") {
       return;
     }
 
     const handleScroll = () => {
+      /*
+       * Do not change active button during
+       * programmatic smooth scrolling.
+       */
       if (navigationLock.current) {
         return;
       }
 
-      const verifyElement = verifyRef.current;
-      const issueElement = issueRef.current;
+      /*
+       * Safety check.
+       */
+      if (window.location.pathname !== "/") {
+        return;
+      }
+
+      const verifyElement =
+        verifyRef.current;
+
+      const issueElement =
+        issueRef.current;
 
       const verifyTop =
         getSectionTop(verifyElement);
@@ -286,14 +406,19 @@ function App() {
       const issueTop =
         getSectionTop(issueElement);
 
+      /*
+       * Offset for the navbar.
+       */
       const scrollPosition =
         window.scrollY + 150;
 
 
       /*
-       * If both sections exist,
-       * determine which section is currently
-       * closest to the navbar.
+       * Create section list and sort it
+       * according to its REAL position.
+       *
+       * This means the code does not assume
+       * Verify comes before Issue.
        */
       const sections = [
         {
@@ -306,16 +431,18 @@ function App() {
         },
       ]
         .filter(
-          (section) => section.top !== null
+          (section) =>
+            section.top !== null
         )
         .sort(
-          (a, b) => a.top - b.top
+          (a, b) =>
+            a.top - b.top
         );
 
 
       /*
        * At the top of Home,
-       * before reaching the first workspace section.
+       * Home is active.
        */
       if (
         sections.length === 0 ||
@@ -327,28 +454,39 @@ function App() {
 
 
       /*
-       * Find the last section that has been reached.
+       * Find the latest section that
+       * has been reached.
        */
       let currentSection = "home";
 
       for (const section of sections) {
-        if (scrollPosition >= section.top) {
-          currentSection = section.name;
+        if (
+          scrollPosition >= section.top
+        ) {
+          currentSection =
+            section.name;
         }
       }
 
-      setActiveSection(currentSection);
+      setActiveSection(
+        currentSection
+      );
     };
 
 
     window.addEventListener(
       "scroll",
       handleScroll,
-      { passive: true }
+      {
+        passive: true,
+      }
     );
 
-    // Run once on load.
+    /*
+     * Run once when Home loads.
+     */
     handleScroll();
+
 
     return () => {
       window.removeEventListener(
@@ -356,19 +494,25 @@ function App() {
         handleScroll
       );
     };
-  }, []);
+  }, [location.pathname]);
 
+
+  /* ========================================
+     NAVBAR
+  ======================================== */
 
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-
+    <>
       <nav className="navbar">
 
-        {/* LOGO / HOME */}
+        {/* ==================================
+            LOGO / HOME
+        ================================== */}
+
         <Link
           to="/"
           className={`logo ${
+            location.pathname === "/" &&
             activeSection === "home"
               ? "active"
               : ""
@@ -383,12 +527,18 @@ function App() {
         </Link>
 
 
+        {/* ==================================
+            NAV LINKS
+        ================================== */}
+
         <div className="nav-links">
 
           {/* HOME */}
+
           <Link
             to="/"
             className={
+              location.pathname === "/" &&
               activeSection === "home"
                 ? "active"
                 : ""
@@ -400,9 +550,11 @@ function App() {
 
 
           {/* VERIFY */}
+
           <button
             type="button"
             className={`nav-link-button ${
+              location.pathname === "/" &&
               activeSection === "verify"
                 ? "active"
                 : ""
@@ -414,9 +566,11 @@ function App() {
 
 
           {/* ISSUE */}
+
           <button
             type="button"
             className={`nav-link-button ${
+              location.pathname === "/" &&
               activeSection === "issue"
                 ? "active"
                 : ""
@@ -428,28 +582,54 @@ function App() {
 
 
           {/* TEAM */}
+
           <NavLink
             to="/team"
             className={({ isActive }) =>
-              isActive ? "active" : ""
+              isActive
+                ? "active"
+                : ""
             }
-            onClick={() =>
-              setActiveSection("team")
-            }
+            onClick={() => {
+              navigationLock.current =
+                true;
+
+              setActiveSection(
+                "team"
+              );
+
+              setTimeout(() => {
+                navigationLock.current =
+                  false;
+              }, 500);
+            }}
           >
             Team
           </NavLink>
 
 
           {/* DETAILS */}
+
           <NavLink
             to="/details"
             className={({ isActive }) =>
-              isActive ? "active" : ""
+              isActive
+                ? "active"
+                : ""
             }
-            onClick={() =>
-              setActiveSection("details")
-            }
+            onClick={() => {
+              navigationLock.current =
+                true;
+
+              setActiveSection(
+                "details"
+              );
+
+              setTimeout(() => {
+                navigationLock.current =
+                  false;
+              }, 500);
+            }}
           >
             Details
           </NavLink>
@@ -457,7 +637,10 @@ function App() {
         </div>
 
 
-        {/* CONNECT WALLET */}
+        {/* ==================================
+            CONNECT WALLET
+        ================================== */}
+
         <button
           className="connect-btn"
           onClick={connectWallet}
@@ -472,6 +655,10 @@ function App() {
 
       </nav>
 
+
+      {/* ====================================
+          ROUTES
+      ==================================== */}
 
       <Routes>
 
@@ -496,9 +683,24 @@ function App() {
         />
 
       </Routes>
+    </>
+  );
+}
 
+
+/* ========================================
+   APP
+======================================== */
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+
+      <AppContent />
     </BrowserRouter>
   );
 }
+
 
 export default App;
