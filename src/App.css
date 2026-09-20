@@ -1798,3 +1798,100 @@ a {
 html {
   scroll-padding-top: 125px;
 }
+
+/* ========================================
+   ACTIVE NAVBAR ITEM
+======================================== */
+
+.nav-links a.active,
+.nav-links .nav-link-button.active {
+  color: #63d991;
+  text-shadow: 0 0 12px rgba(99, 217, 145, 0.18);
+}
+
+.nav-links a.active::after,
+.nav-links .nav-link-button.active::after {
+  width: 100%;
+  background: #63d991;
+  box-shadow: 0 0 8px rgba(99, 217, 145, 0.35);
+}
+
+
+/* ========================================
+   STRONGER TRANSPARENT NAVBAR BLUR
+======================================== */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  isolation: isolate;
+
+  /*
+   * Keep navbar transparent enough for the
+   * glass effect to remain visible.
+   */
+  background: rgba(5, 18, 12, 0.42);
+
+  /*
+   * Strong backdrop blur.
+   */
+  backdrop-filter: blur(30px) saturate(135%);
+  -webkit-backdrop-filter: blur(30px) saturate(135%);
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.14),
+    inset 0 1px rgba(255, 255, 255, 0.06);
+}
+
+
+/*
+ * Additional glass layer.
+ *
+ * This is the important part for making
+ * content passing underneath the navbar
+ * visibly blurred.
+ */
+.navbar::before {
+  content: "";
+  position: absolute;
+
+  /*
+   * Extend slightly beyond the navbar so
+   * the blur has enough backdrop area.
+   */
+  inset: -20px;
+
+  background: rgba(5, 18, 12, 0.10);
+
+  backdrop-filter: blur(32px) saturate(135%);
+  -webkit-backdrop-filter: blur(32px) saturate(135%);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/*
+ * Keep all navbar content above the
+ * glass blur layer.
+ */
+.navbar > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ========================================
+   ACTIVE LOGO
+======================================== */
+
+.logo.active img {
+  filter:
+    drop-shadow(
+      0 0 10px
+      rgba(99, 217, 145, 0.20)
+    );
+}

@@ -8,7 +8,10 @@ import "../App.css";
 
 import backgroundImage from "../background.png";
 
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../contract";
+import {
+  CONTRACT_ADDRESS,
+  CONTRACT_ABI,
+} from "../contract";
 
 async function generateHash(
   certificateId,
@@ -41,25 +44,31 @@ async function generateHash(
   );
 }
 
-function Home({ issueRef, verifyRef }) {
-  const [issueData, setIssueData] = useState({
-    certificateId: "",
-    studentName: "",
-    course: "",
-    institute: "",
-  });
+const emptyCertificateData = {
+  certificateId: "",
+  studentName: "",
+  course: "",
+  institute: "",
+};
 
-  const [verifyData, setVerifyData] = useState({
-    certificateId: "",
-    studentName: "",
-    course: "",
-    institute: "",
-  });
+function Home({ issueRef, verifyRef }) {
+  const [issueData, setIssueData] = useState(
+    emptyCertificateData
+  );
+
+  const [verifyData, setVerifyData] = useState(
+    emptyCertificateData
+  );
 
   const [issueHash, setIssueHash] = useState("");
-  const [transactionHash, setTransactionHash] = useState("");
-  const [issueStatus, setIssueStatus] = useState("");
-  const [verifyStatus, setVerifyStatus] = useState("");
+  const [transactionHash, setTransactionHash] =
+    useState("");
+
+  const [issueStatus, setIssueStatus] =
+    useState("");
+
+  const [verifyStatus, setVerifyStatus] =
+    useState("");
 
   const [certificateDetails, setCertificateDetails] =
     useState(null);
@@ -104,7 +113,9 @@ function Home({ issueRef, verifyRef }) {
     setIssueHash("");
 
     if (!window.ethereum) {
-      setIssueStatus("MetaMask is not installed.");
+      setIssueStatus(
+        "MetaMask is not installed."
+      );
       return;
     }
 
@@ -121,13 +132,16 @@ function Home({ issueRef, verifyRef }) {
       !course ||
       !institute
     ) {
-      setIssueStatus("Please fill in all fields.");
+      setIssueStatus(
+        "Please fill in all fields."
+      );
       return;
     }
 
     try {
-      // Generate certificate hash
-      setIssueStatus("Generating certificate hash...");
+      setIssueStatus(
+        "Generating certificate hash..."
+      );
 
       const hash = await generateHash(
         certificateId,
@@ -138,13 +152,17 @@ function Home({ issueRef, verifyRef }) {
 
       setIssueHash(hash);
 
-      // Connect wallet
-      setIssueStatus("Waiting for MetaMask...");
+      setIssueStatus(
+        "Waiting for MetaMask..."
+      );
 
       const provider =
-        new ethers.BrowserProvider(window.ethereum);
+        new ethers.BrowserProvider(
+          window.ethereum
+        );
 
-      const signer = await provider.getSigner();
+      const signer =
+        await provider.getSigner();
 
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
@@ -152,7 +170,6 @@ function Home({ issueRef, verifyRef }) {
         signer
       );
 
-      // Send certificate to blockchain
       setIssueStatus(
         "Submitting certificate to blockchain..."
       );
@@ -166,17 +183,26 @@ function Home({ issueRef, verifyRef }) {
           hash
         );
 
-      setTransactionHash(transaction.hash);
+      setTransactionHash(
+        transaction.hash
+      );
 
       setIssueStatus(
         "Transaction submitted. Waiting for confirmation..."
       );
 
-      // Wait for blockchain confirmation
       await transaction.wait();
 
       setIssueStatus(
         "Certificate successfully stored on blockchain."
+      );
+
+      /*
+       * CLEAR FORM AFTER SUCCESSFUL
+       * BLOCKCHAIN CONFIRMATION
+       */
+      setIssueData(
+        emptyCertificateData
       );
     } catch (error) {
       console.error(
@@ -245,7 +271,6 @@ function Home({ issueRef, verifyRef }) {
     }
 
     try {
-      // Generate verification hash
       setVerifyStatus(
         "Generating verification hash..."
       );
@@ -257,19 +282,16 @@ function Home({ issueRef, verifyRef }) {
         institute
       );
 
-      // Connect to blockchain
       const provider =
-        new ethers.BrowserProvider(window.ethereum);
+        new ethers.BrowserProvider(
+          window.ethereum
+        );
 
       const contract = new ethers.Contract(
         CONTRACT_ADDRESS,
         CONTRACT_ABI,
         provider
       );
-
-      // --------------------------------
-      // STEP 1: Check if certificate exists
-      // --------------------------------
 
       setVerifyStatus(
         "Checking blockchain record..."
@@ -291,17 +313,23 @@ function Home({ issueRef, verifyRef }) {
         exists,
       ] = certificate;
 
-      // Certificate ID does not exist
+      /*
+       * Certificate does not exist
+       */
       if (!exists) {
         setVerifyStatus(
           "CERTIFICATE NOT FOUND"
         );
+
+        /*
+         * Clear form after verification attempt.
+         */
+        setVerifyData(
+          emptyCertificateData
+        );
+
         return;
       }
-
-      // --------------------------------
-      // STEP 2: Compare certificate hash
-      // --------------------------------
 
       setVerifyStatus(
         "Comparing certificate with blockchain..."
@@ -322,10 +350,6 @@ function Home({ issueRef, verifyRef }) {
         verifiedIssuedAt,
       ] = result;
 
-      // --------------------------------
-      // STEP 3: Display result
-      // --------------------------------
-
       if (isAuthentic) {
         setCertificateDetails({
           studentName: verifiedStudent,
@@ -337,12 +361,22 @@ function Home({ issueRef, verifyRef }) {
           ).toLocaleString(),
         });
 
-        setVerifyStatus("AUTHENTIC");
+        setVerifyStatus(
+          "AUTHENTIC"
+        );
       } else {
         setVerifyStatus(
           "TAMPERED OR INVALID"
         );
       }
+
+      /*
+       * CLEAR FORM AFTER VERIFICATION
+       * IS COMPLETED
+       */
+      setVerifyData(
+        emptyCertificateData
+      );
     } catch (error) {
       console.error(
         "Verification error:",
@@ -418,8 +452,6 @@ function Home({ issueRef, verifyRef }) {
             </div>
           </div>
         </div>
-
-        {/* HERO VERIFICATION CARD */}
 
         <div className="verification-card">
           <div className="card-top">
@@ -559,8 +591,13 @@ function Home({ issueRef, verifyRef }) {
               </div>
 
               <div className="transaction-hash">
-                <span>Transaction Hash</span>
-                <code>{transactionHash}</code>
+                <span>
+                  Transaction Hash
+                </span>
+
+                <code>
+                  {transactionHash}
+                </code>
               </div>
 
               <a
@@ -664,7 +701,9 @@ function Home({ issueRef, verifyRef }) {
                     : "×"}
                 </span>
 
-                <strong>{verifyStatus}</strong>
+                <strong>
+                  {verifyStatus}
+                </strong>
               </div>
 
               <p>
@@ -683,21 +722,27 @@ function Home({ issueRef, verifyRef }) {
               <div>
                 <span>Student</span>
                 <strong>
-                  {certificateDetails.studentName}
+                  {
+                    certificateDetails.studentName
+                  }
                 </strong>
               </div>
 
               <div>
                 <span>Course</span>
                 <strong>
-                  {certificateDetails.course}
+                  {
+                    certificateDetails.course
+                  }
                 </strong>
               </div>
 
               <div>
                 <span>Institute</span>
                 <strong>
-                  {certificateDetails.institute}
+                  {
+                    certificateDetails.institute
+                  }
                 </strong>
               </div>
 
@@ -711,15 +756,15 @@ function Home({ issueRef, verifyRef }) {
               <div>
                 <span>Issued At</span>
                 <strong>
-                  {certificateDetails.issuedAt}
+                  {
+                    certificateDetails.issuedAt
+                  }
                 </strong>
               </div>
             </div>
           )}
         </div>
       </section>
-
-      {/* VERIFLY LICENSE MARK */}
 
       <VeriflyMark />
     </div>

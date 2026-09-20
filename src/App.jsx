@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+
 import {
   BrowserRouter,
   Routes,
   Route,
   Link,
+  NavLink,
   useLocation,
 } from "react-router-dom";
+
 import veriflyLogo from "./verifly_logo.png";
 
 import Home from "./pages/Home";
@@ -16,11 +19,15 @@ function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "instant",
-    });
+    // When changing between actual pages,
+    // always start at the top.
+    if (pathname !== "/") {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "instant",
+      });
+    }
   }, [pathname]);
 
   return null;
@@ -28,6 +35,7 @@ function ScrollToTop() {
 
 function App() {
   const [account, setAccount] = useState(null);
+  const [activeSection, setActiveSection] = useState("home");
 
   const issueRef = useRef(null);
   const verifyRef = useRef(null);
@@ -35,7 +43,7 @@ function App() {
   /*
    * Scroll to a section while keeping it below the navbar.
    */
-  const scrollToSection = (ref, hash) => {
+  const scrollToSection = (ref, hash, sectionName) => {
     if (window.location.pathname !== "/") {
       window.location.href = `/${hash}`;
       return;
@@ -48,6 +56,8 @@ function App() {
     const elementTop =
       ref.current.getBoundingClientRect().top + window.scrollY;
 
+    setActiveSection(sectionName);
+
     window.scrollTo({
       top: elementTop - navbarHeight - 20,
       left: 0,
@@ -55,13 +65,13 @@ function App() {
     });
 
     /*
-     * Update the URL hash without causing another page navigation.
+     * Update URL hash without reloading the page.
      */
     window.history.replaceState(null, "", `/${hash}`);
   };
 
   /*
-   * Always return to the top when Home is clicked.
+   * Always return to the very top when Home is clicked.
    */
   const handleHomeClick = (event) => {
     if (window.location.pathname === "/") {
@@ -73,7 +83,12 @@ function App() {
       window.history.replaceState(null, "", "/");
 
       /*
-       * Scroll all the way to the top of Home.
+       * Mark Home as active.
+       */
+      setActiveSection("home");
+
+      /*
+       * Scroll completely to the top of Home.
        */
       window.scrollTo({
         top: 0,
@@ -111,11 +126,11 @@ function App() {
   };
 
   const scrollToIssue = () => {
-    scrollToSection(issueRef, "#issue");
+    scrollToSection(issueRef, "#issue", "issue");
   };
 
   const scrollToVerify = () => {
-    scrollToSection(verifyRef, "#verify");
+    scrollToSection(verifyRef, "#verify", "verify");
   };
 
   /*
@@ -127,17 +142,32 @@ function App() {
 
     const hash = window.location.hash;
 
-    if (!hash) return;
+    if (!hash) {
+      setActiveSection("home");
+      return;
+    }
+
+    const sectionName =
+      hash === "#verify"
+        ? "verify"
+        : hash === "#issue"
+        ? "issue"
+        : "home";
+
+    setActiveSection(sectionName);
 
     const timer = setTimeout(() => {
-      const element = document.getElementById(hash.substring(1));
+      const element = document.getElementById(
+        hash.substring(1)
+      );
 
       if (!element) return;
 
       const navbarHeight = 78;
 
       const elementTop =
-        element.getBoundingClientRect().top + window.scrollY;
+        element.getBoundingClientRect().top +
+        window.scrollY;
 
       window.scrollTo({
         top: elementTop - navbarHeight - 20,
@@ -149,6 +179,50 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  /*
+   * Keep the active navbar section synchronized
+   * when the user manually scrolls.
+   */
+  useEffect(() => {
+    if (window.location.pathname !== "/") return;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 180;
+
+      const issueElement = issueRef.current;
+      const verifyElement = verifyRef.current;
+
+      if (
+        issueElement &&
+        scrollPosition >= issueElement.offsetTop &&
+        (!verifyElement ||
+          scrollPosition < verifyElement.offsetTop)
+      ) {
+        setActiveSection("issue");
+        return;
+      }
+
+      if (
+        verifyElement &&
+        scrollPosition >= verifyElement.offsetTop
+      ) {
+        setActiveSection("verify");
+        return;
+      }
+
+      setActiveSection("home");
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+    };
+  }, []);
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -156,7 +230,11 @@ function App() {
       <nav className="navbar">
         <Link
           to="/"
-          className="logo"
+          className={`logo ${
+            activeSection === "home"
+              ? "active"
+              : ""
+          }`}
           aria-label="VERIFLY Home"
           onClick={handleHomeClick}
         >
@@ -164,13 +242,25 @@ function App() {
         </Link>
 
         <div className="nav-links">
-          <Link to="/" onClick={handleHomeClick}>
+          <Link
+            to="/"
+            className={
+              activeSection === "home"
+                ? "active"
+                : ""
+            }
+            onClick={handleHomeClick}
+          >
             Home
           </Link>
 
           <button
             type="button"
-            className="nav-link-button"
+            className={`nav-link-button ${
+              activeSection === "verify"
+                ? "active"
+                : ""
+            }`}
             onClick={scrollToVerify}
           >
             Verify
@@ -178,20 +268,50 @@ function App() {
 
           <button
             type="button"
-            className="nav-link-button"
+            className={`nav-link-button ${
+              activeSection === "issue"
+                ? "active"
+                : ""
+            }`}
             onClick={scrollToIssue}
           >
             Issue
           </button>
 
-          <Link to="/team">Team</Link>
+          <NavLink
+            to="/team"
+            className={({ isActive }) =>
+              isActive ? "active" : ""
+            }
+            onClick={() =>
+              setActiveSection("team")
+            }
+          >
+            Team
+          </NavLink>
 
-          <Link to="/details">Details</Link>
+          <NavLink
+            to="/details"
+            className={({ isActive }) =>
+              isActive ? "active" : ""
+            }
+            onClick={() =>
+              setActiveSection("details")
+            }
+          >
+            Details
+          </NavLink>
         </div>
 
-        <button className="connect-btn" onClick={connectWallet}>
+        <button
+          className="connect-btn"
+          onClick={connectWallet}
+        >
           {account
-            ? `${account.slice(0, 6)}...${account.slice(-4)}`
+            ? `${account.slice(
+                0,
+                6
+              )}...${account.slice(-4)}`
             : "Connect Wallet"}
         </button>
       </nav>
@@ -207,9 +327,15 @@ function App() {
           }
         />
 
-        <Route path="/team" element={<Team />} />
+        <Route
+          path="/team"
+          element={<Team />}
+        />
 
-        <Route path="/details" element={<Details />} />
+        <Route
+          path="/details"
+          element={<Details />}
+        />
       </Routes>
     </BrowserRouter>
   );
