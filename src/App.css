@@ -92,9 +92,14 @@ a {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(5, 18, 12, 0.72);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+
+  /* Transparent glass effect */
+  background: rgba(5, 18, 12, 0.35);
+
+  /* Stronger blur for content passing underneath */
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
   box-shadow:
     0 8px 30px rgba(0, 0, 0, 0.12),
     inset 0 1px rgba(255, 255, 255, 0.05);
@@ -284,6 +289,8 @@ a {
   margin-bottom: 45px;
 }
 
+/* Main green button */
+
 .primary-btn,
 .secondary-btn {
   min-width: 185px;
@@ -301,8 +308,6 @@ a {
     border-color 0.25s ease,
     box-shadow 0.25s ease;
 }
-
-/* Main green button */
 
 .primary-btn {
   border: 1px solid rgba(99, 217, 145, 0.9);
@@ -847,7 +852,10 @@ a {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 28px;
-  scroll-margin-top: 100px;
+
+  /* Keeps Verify / Issue section below the navbar */
+  scroll-margin-top: 115px;
+
   position: relative;
   z-index: 3;
 }
